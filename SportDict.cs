@@ -39,7 +39,7 @@ namespace Provys.Custom.OTE
 
             PopulateIfEmpty();
 
-            var typedData = from d in this.data where d.Type == type select new TupleFromTo(fromEN ? d.TitleEN : d.TitleGR, fromEN ? d.TitleGR : d.TitleEN); // Teams / Venues...
+            var typedData = from d in this.data where d.Type == type select d.ToTuple(fromEN); // Teams / Venues...
 
             // exactmatch returns translation
             var exactMatch = from d in typedData where string.Compare(input, d.From, StringComparison.InvariantCultureIgnoreCase) == 0 select d.To;
@@ -70,9 +70,9 @@ namespace Provys.Custom.OTE
         {
             PopulateIfEmpty();
 
-            var typedData = from d in this.data where d.Type == type select fromEN ? d.TitleEN : d.TitleGR;
-            var result = from d in typedData where d.Contains(input, StringComparison.InvariantCultureIgnoreCase) select d;
-            return result.ToList();
+            var typedData = from d in this.data where d.Type == type select d.ToTuple(fromEN);
+            var result = from d in typedData where d.From.Contains(input, StringComparison.InvariantCultureIgnoreCase) select d.From;
+            return result;
         }
     }
 
@@ -88,6 +88,10 @@ namespace Provys.Custom.OTE
         public SportDictSource Source { get; set; }
         public string TitleEN { get; set; }
         public string TitleGR { get; set; }
+        public TupleFromTo ToTuple(bool fromEN)
+        {
+            return new TupleFromTo(fromEN ? TitleEN : TitleGR, fromEN ? TitleGR : TitleEN);
+        }
     }
 
     public class TupleFromTo
